@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { DateRangePicker } from './components/DateRangePicker';
 import { useFetch } from './hooks/useFetch';
+import { UTC } from './utils/UTCDate';
 
 export function App(): JSX.Element {
-  const [startDate, setStartDate] = useState('2020-03-01');
-  const [endDate, setEndDate] = useState('2021-08-01');
+  const [startDate, setStartDate] = useState(new UTC(2020, 2, 1));
+  const [endDate, setEndDate] = useState(new UTC(2021, 7, 1));
 
   interface FetchData {
     prices: [timeStamp: number, price: number][];
@@ -15,20 +17,15 @@ export function App(): JSX.Element {
     'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?' +
       new URLSearchParams({
         vs_currency: 'eur',
-        from: (new Date(startDate).getTime() / 1000).toFixed(0),
-        to: (new Date(endDate).getTime() / 1000 + 3600).toFixed(0)
+        from: (startDate.getTime() / 1000).toFixed(0),
+        to: (endDate.getTime() / 1000 + 3600).toFixed(0)
       }),
     [startDate, endDate]
   );
 
   // Takes a timestamp and returns the timestamp for 00:00:00:000 corresponding to the UTC date of the timestamp.
   function getUTCMidnight(timeStamp: number): number {
-    const date = new Date(timeStamp);
-    return Date.UTC(
-      date.getUTCFullYear(),
-      date.getUTCMonth(),
-      date.getUTCDate()
-    );
+    return timeStamp - (timeStamp % 86400000);
   }
 
   // Takes data of varying granularity and returns only the datapoints closest to midnight for each present UTC date.
@@ -147,24 +144,12 @@ export function App(): JSX.Element {
 
   return (
     <>
-      <label htmlFor="startDate">
-        Startdate{' '}
-        <input
-          id="startDate"
-          type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-        ></input>
-      </label>{' '}
-      <label htmlFor="startDate">
-        Enddate{' '}
-        <input
-          id="endDate"
-          type="date"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-        ></input>
-      </label>
+      <DateRangePicker
+        startDate={startDate}
+        endDate={endDate}
+        setStartDate={setStartDate}
+        setEndDate={setEndDate}
+      />
       {information && (
         <>
           <h2>
