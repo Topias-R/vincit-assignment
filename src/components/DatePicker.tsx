@@ -2,49 +2,88 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { UTC } from '../utils/UTCDate';
 
-const Container = styled.div({
-  display: 'grid',
-  gridTemplateColumns: 'repeat(2, min-content)',
-  gridTemplateRows: 'repeat(2, min-content)',
-  gap: '10px'
-});
+const Container = styled.div`
+  display: grid;
+  grid-template-rows: max-content max-content;
+  gap: 0.5rem;
+`;
 
-const CalendarControlContainer = styled.div({
-  display: 'grid',
-  gridAutoFlow: 'column'
-});
+const CalendarControlContainer = styled.div`
+  display: grid;
+  justify-content: space-between;
+  grid-auto-flow: column;
+`;
 
-const MonthYearLabel = styled.div({
-  flexBasis: 1,
-  textAlign: 'center'
-});
+const MonthYearLabel = styled.div`
+  align-self: center;
+  text-align: center;
+`;
 
-const MonthRollButton = styled.button({});
+const MonthRollButton = styled.button`
+  padding: 0rem;
+  border: none;
+  background-color: transparent;
+  color: transparent;
+  width: 0rem;
+  height: 0rem;
+  border-radius: 0.125rem;
+  transition: transform 50ms;
+  &:hover {
+    transform: scale(1.1);
+  }
+  &:active {
+    transform: scale(1.2);
+  }
+`;
 
-const Calendar = styled.div({
-  display: 'grid',
-  gridRow: '2',
-  gridTemplateColumns: 'repeat(7, 34px)',
-  gridTemplateRows: 'repeat(6, 34px)',
-  gap: '1px'
-});
+const LeftMonthRollButton = styled(MonthRollButton)`
+  border-top: 0.5rem solid transparent;
+  border-bottom: 0.5rem solid transparent;
+  border-right: 2rem solid white;
+`;
+
+const RightMonthRollButton = styled(MonthRollButton)`
+  border-top: 0.5rem solid transparent;
+  border-bottom: 0.5rem solid transparent;
+  border-left: 2rem solid white;
+`;
+
+const Calendar = styled.div`
+  display: grid;
+  grid-row: 2;
+  grid-template-columns: repeat(7, 2rem);
+  grid-template-rows: repeat(6, 2rem);
+  gap: 0.125rem;
+`;
 
 interface DayProps {
   readonly deEmphasized: boolean;
   readonly highlighted: boolean;
 }
 
-const Day = styled.div<DayProps>(({ deEmphasized, highlighted }) => ({
-  backgroundColor: highlighted
-    ? deEmphasized
-      ? 'lightblue'
-      : 'blue'
-    : deEmphasized
-    ? 'lightgray'
-    : 'gray',
-  color: 'white',
-  textAlign: 'center'
-}));
+const Day = styled.button<DayProps>`
+  background-color: ${({ deEmphasized, highlighted }) =>
+    highlighted
+      ? deEmphasized
+        ? '#6200EE'
+        : '#3700B3'
+      : deEmphasized
+      ? '#efe5fd'
+      : '#d4bff9'};
+  border: none;
+  padding: 0rem;
+  font-family: monospace;
+  font-size: 1em;
+  font-weight: bold;
+  user-select: none;
+  border-radius: 0.25rem;
+  color: ${({ highlighted }) => (highlighted ? '#fff' : '#000')};
+  text-align: center;
+  transition: border 100ms;
+  &:hover {
+    border: 1px solid ${({ highlighted }) => (highlighted ? '#fff' : '#000')};
+  }
+`;
 
 // Takes a date of any month and generates dates for a 42-slot calendar.
 function generateDates(date: UTC): UTC[] {
@@ -88,60 +127,54 @@ function getLocaleMonthAndYear(date: UTC): string {
   });
 }
 
-interface DatePickerProps {
-  date: UTC;
-  setDate: React.Dispatch<React.SetStateAction<UTC>>;
-  isHighlighted?: (day: UTC) => boolean;
-  isDeEmphasized?: (day: UTC) => boolean;
-  isDisabled?: (day: UTC) => boolean;
+export interface DatePickerProps {
+  date: UTC | undefined;
+  setDate: React.Dispatch<React.SetStateAction<UTC | undefined>>;
+  isHighlighted?: (day: UTC, month: UTC) => boolean;
+  isDeEmphasized?: (day: UTC, month: UTC) => boolean;
+  isDisabled?: (day: UTC, month: UTC) => boolean;
 }
 
 export function DatePicker({
   date,
   setDate,
-  isHighlighted,
-  isDeEmphasized,
+  isHighlighted = (day, _month) => day.getTime() === date?.getTime(), // Highlight the selected date by default.
+  isDeEmphasized = (day, month) => day.getUTCMonth() !== month.getUTCMonth(), // De-emphasize off-month days by default.
   isDisabled
 }: DatePickerProps): JSX.Element {
-  const [monthYear, setMonthYear] = useState(
-    new UTC(date.getUTCFullYear(), date.getUTCMonth())
+  const [month, setMonthYear] = useState(
+    new UTC(
+      (date ?? new UTC()).getUTCFullYear(),
+      (date ?? new UTC()).getUTCMonth()
+    )
   );
 
   return (
     <Container>
       <CalendarControlContainer>
-        <MonthRollButton
+        <LeftMonthRollButton
           onClick={() =>
             setMonthYear(
-              new UTC(monthYear.getUTCFullYear(), monthYear.getUTCMonth() - 1)
+              new UTC(month.getUTCFullYear(), month.getUTCMonth() - 1)
             )
           }
-        >
-          &lt;
-        </MonthRollButton>
-        <MonthYearLabel>{getLocaleMonthAndYear(monthYear)}</MonthYearLabel>
-        <MonthRollButton
+        />
+        <MonthYearLabel>{getLocaleMonthAndYear(month)}</MonthYearLabel>
+        <RightMonthRollButton
           onClick={() =>
             setMonthYear(
-              new UTC(monthYear.getUTCFullYear(), monthYear.getUTCMonth() + 1)
+              new UTC(month.getUTCFullYear(), month.getUTCMonth() + 1)
             )
           }
-        >
-          &gt;
-        </MonthRollButton>
+        />
       </CalendarControlContainer>
       <Calendar>
-        {generateDates(monthYear).map((day) => (
+        {generateDates(month).map((day) => (
           <Day
             key={day.getTime()}
-            deEmphasized={
-              isDeEmphasized?.(day) ||
-              day.getUTCMonth() !== monthYear.getUTCMonth() // De-emphasize off-month days by default.
-            }
-            highlighted={
-              isHighlighted?.(day) || day.getTime() === date.getTime() // Highlight the selected date by default.
-            }
-            onClick={() => isDisabled?.(day) || setDate(day)} // No day is disabled by default.
+            deEmphasized={isDeEmphasized(day, month)}
+            highlighted={isHighlighted(day, month)}
+            onClick={() => isDisabled?.(day, month) || setDate(day)}
           >
             {day.getUTCDate()}
           </Day>
