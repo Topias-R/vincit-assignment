@@ -174,7 +174,10 @@ export function DatePicker({
             key={day.getTime()}
             deEmphasized={isDeEmphasized(day, month)}
             highlighted={isHighlighted(day, month)}
-            onClick={() => isDisabled?.(day, month) || setDate(day)}
+            onClick={() =>
+              isDisabled?.(day, month) ||
+              setDate(day.getTime() === date?.getTime() ? undefined : day)
+            }
           >
             {day.getUTCDate()}
           </Day>

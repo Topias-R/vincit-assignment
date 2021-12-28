@@ -12,10 +12,16 @@ import {
 import { UTC } from './utils/UTCDate';
 import styled from 'styled-components';
 import { useFetch } from './hooks/useFetch';
+import { Price } from './components/Price';
+import capitalize from './utils/capitalize';
 
 const Container = styled.div`
+  width: 100%;
+  height: 100%;
   display: grid;
-  justify-content: center;
+  grid-auto-rows: max-content;
+  overflow: auto;
+  justify-content: safe center;
 `;
 
 const ErrorDisplay = styled.h2`
@@ -23,16 +29,9 @@ const ErrorDisplay = styled.h2`
   color: #b00020;
 `;
 
-const Price = styled.span`
-  font-weight: bold;
-  color: #85bb65;
-`;
-
 export function App(): JSX.Element {
-  const [startDate, setStartDate] = useState<UTC | undefined>(
-    new UTC(2020, 2, 1)
-  );
-  const [endDate, setEndDate] = useState<UTC | undefined>(new UTC(2021, 7, 1));
+  const [startDate, setStartDate] = useState<UTC | undefined>();
+  const [endDate, setEndDate] = useState<UTC | undefined>();
 
   const cryptoCurrency = 'bitcoin';
   const currency = 'eur';
@@ -72,7 +71,7 @@ export function App(): JSX.Element {
     );
   }
 
-  if (!marketChartRangeData)
+  if (!marketChartRangeData || !startDate || !endDate)
     return (
       <Container>
         <DateRangePicker
@@ -96,24 +95,34 @@ export function App(): JSX.Element {
     )
   };
 
-  const formatPrice = (price: number, currency: string): JSX.Element => (
-    <Price>
-      {price.toLocaleString(undefined, { style: 'currency', currency })}
-    </Price>
-  );
+  const firstDate = marketChartRangeData.prices[0]?.date.toLocaleDateString();
+  const lastDate = marketChartRangeData.prices
+    .at(-1)
+    ?.date.toLocaleDateString();
 
   const displayInfo = [
     {
+      title: `${capitalize(cryptoCurrency)} data between`,
+      body: firstDate && lastDate ? `${firstDate} - ${lastDate}` : 'No data.'
+    },
+    {
       title: 'Longest downward trend',
-      body: `${info.longestDownwardTrend} days`
+      body: info.longestDownwardTrend
+        ? `${info.longestDownwardTrend} days`
+        : 'No trends.'
     },
     {
       title: 'Highest trading volume',
-      body: (
+      body: info.highestTradingVolume ? (
         <>
-          {formatPrice(info.highestTradingVolume.totalVolume, currency)} on{' '}
-          {info.highestTradingVolume.date.toLocaleDateString()}
+          <Price
+            value={info.highestTradingVolume.totalVolume}
+            currency={currency}
+          />{' '}
+          on {info.highestTradingVolume.date.toLocaleDateString()}
         </>
+      ) : (
+        'No highest volume.'
       )
     },
     {
@@ -124,20 +133,20 @@ export function App(): JSX.Element {
             Buy on{' '}
             {info.highestProfitTradingDatePair.buyDate.date.toLocaleDateString()}{' '}
             at{' '}
-            {formatPrice(
-              info.highestProfitTradingDatePair.buyDate.price,
-              currency
-            )}
+            <Price
+              value={info.highestProfitTradingDatePair.buyDate.price}
+              currency={currency}
+            />
           </span>
           <br />
           <span>
             Sell on{' '}
             {info.highestProfitTradingDatePair.sellDate.date.toLocaleDateString()}{' '}
             at{' '}
-            {formatPrice(
-              info.highestProfitTradingDatePair.sellDate.price,
-              currency
-            )}
+            <Price
+              value={info.highestProfitTradingDatePair.sellDate.price}
+              currency={currency}
+            />
           </span>
         </>
       ) : (

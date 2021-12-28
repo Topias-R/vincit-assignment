@@ -2,8 +2,8 @@ import { NormalizedMarketChartRangeData } from '../api/marketChartRangeEndPoint'
 
 export function findLengthOfLongestDownwardTrend(
   prices: NormalizedMarketChartRangeData['prices']
-): number {
-  if (prices.length < 2) throw new Error('Not enough datapoints.');
+): number | null {
+  if (!prices.length) return null;
 
   // Group datapoints by Downward trend.
   // [[3, 2], [4], [5], [5, 1]]

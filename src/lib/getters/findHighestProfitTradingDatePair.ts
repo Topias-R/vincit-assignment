@@ -6,7 +6,7 @@ export function findHighestProfitTradingDatePair(
   buyDate: NormalizedMarketChartRangeData['prices'][number];
   sellDate: NormalizedMarketChartRangeData['prices'][number];
 } | null {
-  if (prices.length < 2) throw new Error('Not enough datapoints.');
+  if (prices.length < 2) return null;
 
   // For each day, find every later day with a higher price.
   const candidates = prices.flatMap((buyDate, idx, arr) =>

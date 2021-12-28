@@ -5,7 +5,7 @@ import { DatePicker, DatePickerProps } from './DatePicker';
 const Container = styled.div`
   display: grid;
   grid-template-columns: max-content max-content;
-  grid-template-rows: max-content max-content;
+  grid-template-rows: max-content max-content max-content;
   column-gap: 1rem;
   row-gap: 0.5rem;
   padding: 1rem;
@@ -15,14 +15,12 @@ const Container = styled.div`
   background-color: #1e1e1e;
 `;
 
-const RangeDisplay = styled.div``;
-
-const LeftRangeDisplay = styled(RangeDisplay)`
-  text-align: end;
+const Label = styled.label`
+  text-align: center;
 `;
 
-const RightRangeDisplay = styled(RangeDisplay)`
-  text-align: 'start';
+const RangeDisplay = styled.div`
+  text-align: center;
 `;
 
 interface DateRangePickerProps {
@@ -40,6 +38,8 @@ export function DateRangePicker({
 }: DateRangePickerProps): JSX.Element {
   return (
     <Container>
+      <Label>Start Date</Label>
+      <Label>End Date</Label>
       <DatePicker
         date={startDate}
         setDate={setStartDate}
@@ -62,12 +62,8 @@ export function DateRangePicker({
           day.getTime() <= (startDate?.getTime() ?? -Infinity)
         }
       />
-      <LeftRangeDisplay>
-        {startDate?.toLocaleDateString() ?? ''}
-      </LeftRangeDisplay>
-      <RightRangeDisplay>
-        {endDate?.toLocaleDateString() ?? ''}
-      </RightRangeDisplay>
+      <RangeDisplay>{startDate?.toLocaleDateString() ?? '-'}</RangeDisplay>
+      <RangeDisplay>{endDate?.toLocaleDateString() ?? '-'}</RangeDisplay>
     </Container>
   );
 }
