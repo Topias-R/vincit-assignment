@@ -39,7 +39,7 @@ function uniformalizeDataPoints(
 
     const dataPointClosestToMidnight = dataPointsForDay.reduce(
       (closest, dataPoint) =>
-        midnight - dataPoint[0] < midnight - closest[0] ? dataPoint : closest
+        dataPoint[0] - midnight < closest[0] - midnight ? dataPoint : closest
     );
 
     return dataPointClosestToMidnight;
