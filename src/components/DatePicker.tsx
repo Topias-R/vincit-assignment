@@ -27,6 +27,8 @@ const MonthRollButton = styled.button`
   width: 0rem;
   height: 0rem;
   border-radius: 0.125rem;
+  border-top: 0.5rem solid transparent;
+  border-bottom: 0.5rem solid transparent;
   transition: transform 50ms;
   &:hover {
     transform: scale(1.1);
@@ -37,14 +39,10 @@ const MonthRollButton = styled.button`
 `;
 
 const LeftMonthRollButton = styled(MonthRollButton)`
-  border-top: 0.5rem solid transparent;
-  border-bottom: 0.5rem solid transparent;
   border-right: 2rem solid white;
 `;
 
 const RightMonthRollButton = styled(MonthRollButton)`
-  border-top: 0.5rem solid transparent;
-  border-bottom: 0.5rem solid transparent;
   border-left: 2rem solid white;
 `;
 
@@ -62,14 +60,14 @@ interface DayProps {
 }
 
 const Day = styled.button<DayProps>`
-  background-color: ${({ deEmphasized, highlighted }) =>
-    highlighted
-      ? deEmphasized
-        ? '#6200EE'
-        : '#3700B3'
-      : deEmphasized
-      ? '#efe5fd'
-      : '#d4bff9'};
+  background-color: ${(props) =>
+    props.highlighted
+      ? props.deEmphasized
+        ? props.theme.colors.secondary.main
+        : props.theme.colors.primary.main
+      : props.deEmphasized
+      ? props.theme.colors.secondary.light
+      : props.theme.colors.primary.light};
   border: none;
   padding: 0rem;
   font-family: monospace;
@@ -77,11 +75,15 @@ const Day = styled.button<DayProps>`
   font-weight: bold;
   user-select: none;
   border-radius: 0.25rem;
-  color: ${({ highlighted }) => (highlighted ? '#fff' : '#000')};
+  color: ${(props) =>
+    props.highlighted
+      ? props.theme.colors.text.light
+      : props.theme.colors.text.dark};
   text-align: center;
   transition: border 100ms;
   &:hover {
-    border: 1px solid ${({ highlighted }) => (highlighted ? '#fff' : '#000')};
+    border: 1px solid
+      ${({ highlighted }) => (highlighted ? '#ffffff' : '#000000')};
   }
 `;
 

@@ -18,19 +18,19 @@ const animation = keyframes`
   }
 `;
 
-interface RocketContainerProps {
+interface Container {
   readonly top: number;
   readonly delay: number;
 }
 
-const RocketContainer = styled.div<RocketContainerProps>`
+const Container = styled.div<Container>`
   position: absolute;
   width: 0.25rem;
   height: 0.25rem;
   top: ${({ top }) => `${top}vh`};
   left: 50%;
   z-index: -1;
-  background: #fff;
+  background: #ffff00;
   border-radius: 50%;
   box-shadow: 0 0 0 0.25rem rgba(236, 94, 11, 0.1),
     0 0 0 0.5rem rgba(236, 94, 11, 0.1), 0 0 1.25rem rgba(236, 94, 11, 1);
@@ -62,11 +62,11 @@ const Emoji = styled.div`
 
 export function Rocket(): JSX.Element {
   return (
-    <RocketContainer
+    <Container
       top={Math.floor(Math.random() * 301 - 100)}
       delay={Math.random() * 20 - 10}
     >
       <Emoji>🚀</Emoji>
-    </RocketContainer>
+    </Container>
   );
 }

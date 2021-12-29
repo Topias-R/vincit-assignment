@@ -10,7 +10,7 @@ export function useFetch<T>(
 ): [T | undefined, unknown];
 export function useFetch<T>(
   url: RequestInfo | null,
-  options?: RequestInit,
+  options: RequestInit,
   deps?: DependencyList
 ): [T | undefined, unknown];
 export function useFetch<T>(

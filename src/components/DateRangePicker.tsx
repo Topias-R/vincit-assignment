@@ -1,18 +1,17 @@
 import React from 'react';
 import styled from 'styled-components';
 import { DatePicker, DatePickerProps } from './DatePicker';
+import { Surface } from './Surface';
 
-const Container = styled.div`
+const Container = styled(Surface)`
   display: grid;
   grid-template-columns: max-content max-content;
   grid-template-rows: max-content max-content max-content;
+  justify-content: center;
   column-gap: 1rem;
   row-gap: 0.5rem;
   padding: 1rem;
-  border-radius: 0.25rem;
   margin: 1rem;
-  box-shadow: 0.25rem 0.5rem 0.5rem hsl(0deg 0% 0% / 0.38);
-  background-color: #1e1e1e;
 `;
 
 const Label = styled.label`
